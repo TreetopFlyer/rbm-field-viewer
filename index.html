@@ -16,10 +16,11 @@
             var circleRaw;
             var circleSVG;
             
-            circleRaw = M.Combine(
-                [M.Circle([0.7, 0.5], 0.3, 0.1, 100),
-                M.Circle([0.2, 0.3], 0.3, 0.1, 100)]
-            );
+            circleRaw = M.Combine([
+                M.Circle([0.7, 0.5], 0.3, 0.1, 100),
+                M.Circle([0.2, 0.3], 0.3, 0.1, 100),
+                M.Circle([0.2, 0.8], 0.2, 0.1, 100)
+            ]);
             circleSVG = svg`
             <g>
             ${circleRaw.map( inPoint=>
@@ -39,13 +40,13 @@
             var stages;
             var itr;
             var rbm1;
-            rbm1 = RBM.Create(2, 20);
+            rbm1 = RBM.Create(2, 10);
             RBM.Train(rbm1, circleRaw, 1000, 1, 0.01);
 
             itr = 3;
             stages = [];
             gridRaw = [];
-            gridCount = 10;
+            gridCount = 20;
             for(i=0; i<gridCount; i++)
             {
                 for(j=0; j<gridCount; j++)
