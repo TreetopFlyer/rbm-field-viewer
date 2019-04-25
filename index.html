@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="vcore.js"></script>
+        <script src="rbm.js"></script>
+    </head>
+    <body>
+        <div id="App">
+            <svg width="768" height="768" viewBox="0, 0, 1, 1">
+
+            </svg>
+        </div>
+        <script type="module">
+            import { html, svg, render } from './node_modules/lit-html/lit-html.js';
+
+            var circleRaw;
+            var circleSVG;
+            
+            circleRaw = M.Combine(
+                [M.Circle([0.7, 0.5], 0.3, 0.1, 100),
+                M.Circle([0.2, 0.3], 0.3, 0.1, 100)]
+            );
+            circleSVG = svg`
+            <g>
+            ${circleRaw.map( inPoint=>
+            {
+                return svg`
+                <circle r="0.01" cx=${inPoint[0]} cy=${inPoint[1]} fill="black"></circle>
+                `;
+            }
+            )}
+            </g>
+            `;
+
+            var i, j;
+            var gridCount;
+            var gridRaw;
+            var gridSVG;
+            var stages;
+            var itr;
+            var rbm1;
+            rbm1 = RBM.Create(2, 20);
+            RBM.Train(rbm1, circleRaw, 1000, 1, 0.01);
+
+            itr = 3;
+            stages = [];
+            gridRaw = [];
+            gridCount = 10;
+            for(i=0; i<gridCount; i++)
+            {
+                for(j=0; j<gridCount; j++)
+                {
+                    var x, y;
+                    x = i/gridCount;
+                    y = j/gridCount;
+                    gridRaw.push([x, y]);
+                }
+            }
+            stages.push(gridRaw);
+            for(i=0; i<itr; i++)
+            {
+                stages.push(RBM.Fabricate(rbm1, stages[stages.length-1], 1));
+            }
+            gridSVG = svg`
+            <g>
+            ${gridRaw.map( (inPoint, inPointIndex)=>
+            {
+                var path;
+                path = [];
+                stages.map( inStage=>
+                {
+                    path.push( inStage[inPointIndex].join(" ") );
+                });
+                return svg`<polyline fill="none" stroke="orange" stroke-width="0.3%" points=${path.join(", ")} />`;
+            })}
+            </g>
+            `;
+
+            render( [circleSVG, gridSVG], document.querySelector("svg"));
+
+
+
+        </script>
+    </body>
+</html>
