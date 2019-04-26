@@ -19,7 +19,7 @@ RBM.Create = function(inDimensionsIn, inDimensionsOut)
     obj.MatrixBackward = M.Transpose(obj.MatrixForward);
     
     obj.NoiseHidden = RBM.Noise.None;
-    obj.NoiseVisible = RBM.Noise.None;
+    obj.NoiseVisible = RBM.Noise.None; // gaussian causes cluster merging
 
     obj.DeformHidden = RBM.Deform.Sigmoid;
     obj.DeformVisible = RBM.Deform.Sigmoid;
@@ -83,7 +83,7 @@ RBM.Noise = {
         for(i=0; i<inData.length; i++)
         {
             /* [center coords], radius, pinch, count */
-            inData[i] = M.Circle(inData[i], 0.8, 0.2, 1)[0];
+            inData[i] = M.Circle(inData[i], 0.1, 0.01, 1)[0];
         }
         return inData;
     }

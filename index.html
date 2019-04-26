@@ -16,17 +16,27 @@
             var circleRaw;
             var circleSVG;
             
+            
             circleRaw = M.Combine([
-                M.Circle([0.7, 0.5], 0.3, 0.1, 100),
-                M.Circle([0.2, 0.3], 0.3, 0.1, 100),
-                M.Circle([0.2, 0.8], 0.2, 0.1, 100)
+                M.Circle([0.1, 0.1], 0.2, 0.1, 100),
+                M.Circle([0.6, 0.6], 0.2, 0.1, 100),
+                M.Circle([0.2, 0.5], 0.2, 0.1, 100),
+                M.Circle([0.9, 0.9], 0.2, 0.1, 100)
             ]);
+            
+           /*
+            circleRaw = M.Combine([
+                M.Box([[0.1, 0.1], [0.6, 0.3]], 100),
+                M.Box([[0.6, 0.1], [0.8, 1.0]], 200),
+                M.Box([[0.3, 0.5], [0.6, 0.6]], 100),
+            ]);
+            */
             circleSVG = svg`
             <g>
             ${circleRaw.map( inPoint=>
             {
                 return svg`
-                <circle r="0.01" cx=${inPoint[0]} cy=${inPoint[1]} fill="black"></circle>
+                <circle r="0.3%" cx=${inPoint[0]} cy=${inPoint[1]} fill="black"></circle>
                 `;
             }
             )}
@@ -40,13 +50,15 @@
             var stages;
             var itr;
             var rbm1;
-            rbm1 = RBM.Create(2, 10);
-            RBM.Train(rbm1, circleRaw, 1000, 1, 0.01);
+            rbm1 = RBM.Create(2, 3);// high reconstruction dimensions allow for tighter clustering
+            RBM.Train(rbm1, circleRaw, 800, 1, 0.01);
+            RBM.Train(rbm1, circleRaw, 800, 2, 0.005);
+            RBM.Train(rbm1, circleRaw, 800, 3, 0.0025);
 
-            itr = 3;
+            itr = 10;
             stages = [];
             gridRaw = [];
-            gridCount = 20;
+            gridCount = 50;
             for(i=0; i<gridCount; i++)
             {
                 for(j=0; j<gridCount; j++)
@@ -58,13 +70,14 @@
                 }
             }
             stages.push(gridRaw);
+            //stages.push(circleRaw);
             for(i=0; i<itr; i++)
             {
                 stages.push(RBM.Fabricate(rbm1, stages[stages.length-1], 1));
             }
             gridSVG = svg`
             <g>
-            ${gridRaw.map( (inPoint, inPointIndex)=>
+            ${stages[0].map( (inPoint, inPointIndex)=>
             {
                 var path;
                 path = [];
@@ -72,7 +85,7 @@
                 {
                     path.push( inStage[inPointIndex].join(" ") );
                 });
-                return svg`<polyline fill="none" stroke="orange" stroke-width="0.3%" points=${path.join(", ")} />`;
+                return svg`<polyline fill="none" stroke="orange" stroke-width="0.1%" points=${path.join(", ")} />`;
             })}
             </g>
             `;
